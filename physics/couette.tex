@@ -1,0 +1,72 @@
+\section{\texorpdfstring{Течение Куэтта}{Couette flow}}
+\begin{gather*}
+    \vec{V} = (u, v) \\
+    u = \frac{u_0 y}{h} \qquad v = 0
+\end{gather*}
+
+\subsection{\texorpdfstring{Дивергенция}{Divergence}}
+\[
+    \dvg{\vec V} = \frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} = 0
+\]
+
+\subsection{\texorpdfstring{Ротор}{Curl}}
+\[
+    \rot{\vec V} = \nabla \times \vec V = \vec k \left( \frac{\partial v}{\partial x} - \frac{\partial u}{\partial y} \right)
+    = - \frac{u_0}{h} \vec k = \left(0; 0; -\frac{u_0}{h}\right)
+\]
+
+\subsection{\texorpdfstring{Тензор деформации}{Deformation tensor}}
+\begin{gather*}
+    \hat S =
+    \begin{pmatrix}
+        \eps_{11} & \eps_{12} \\
+        \eps_{21} & \eps_{22}
+    \end{pmatrix} \\
+    \eps_{11} = \frac{\partial u}{\partial x} = 0 \qquad
+    \eps_{12} = \eps_{21} = \frac{1}{2} \left( \frac{\partial u}{\partial y} + \frac{\partial v}{\partial x} \right) = \frac{u_0}{2h}\qquad
+    \eps_{22} = \frac{\partial v}{\partial y} = 0 \\
+    \hat S =
+    \begin{pmatrix}
+        0 & u_0/2h \\
+        u_0/2h & 0
+    \end{pmatrix} \\
+\end{gather*}
+
+\subsection{\texorpdfstring{Скалярный потенциал}{Scalar potential}}
+\[
+    \vec V = \grad \varphi
+\]
+$\varphi$ не существует так как $\rot{\vec V} \neq 0$.
+
+\subsection{\texorpdfstring{Функция тока}{Stream function}}
+\[
+    \vec V = \rot\left(\psi \vec k\right)
+\]
+\begin{align*}
+    \frac{\partial \psi}{\partial y} &= u = \frac{u_0 y}{h} &
+    -\frac{\partial \psi}{\partial x} &= v = 0 \\
+    \psi &= \frac{u_0 y^2}{2h} + F_x(x) &
+    \psi &= 0 + F_y(y)
+\end{align*}
+\[
+    \psi = \frac{u_0 y^2}{2h}
+\]
+
+\subsection{\texorpdfstring{Главные оси тензора деформации}{Eigenvectors of deformation tensor}}
+\begin{gather*}
+    \begin{vmatrix}
+        -\lambda & u_0/2h \\
+        u_0/2h & -\lambda
+    \end{vmatrix}
+    = \lambda^2 - \left(\frac{u_0}{2h}\right)^2
+    = 0 \\
+    \lambda = \pm \frac{u_0}{2h} \\
+    X_1 =
+    \begin{pmatrix}
+        +1 \\ -1
+    \end{pmatrix} \qquad
+    X_2 =
+    \begin{pmatrix}
+        +1 \\ +1
+    \end{pmatrix}
+\end{gather*}
