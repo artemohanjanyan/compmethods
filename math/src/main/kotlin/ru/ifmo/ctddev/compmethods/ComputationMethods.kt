@@ -8,7 +8,9 @@ class IterativeComputationSequence(start: Complex,
     : Iterator<Complex> {
 
     private var cur = start
-        get
+
+    val current : Complex
+        get() = cur
 
     private var next = computeNext()
 
@@ -23,3 +25,7 @@ class IterativeComputationSequence(start: Complex,
     private fun computeNext() = cur - function(cur) * lambda(cur)
 }
 
+fun IterativeComputationSequence.computeRoot() : Complex {
+    for(c in this) { }
+    return current
+}
