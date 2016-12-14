@@ -56,7 +56,7 @@ class SinPlot() : JFrame() {
             plot.getPointRenderers(it.first)[0].color = SingleColor(it.second)
         }
 
-        setSize(600, 600)
+        setSize(800, 800)
         defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         contentPane.layout = BorderLayout()
         interactivePanel = InteractivePanel(plot)
@@ -88,7 +88,6 @@ class SinPlot() : JFrame() {
         })
 
         redraw()
-
     }
 
     fun redraw() {
