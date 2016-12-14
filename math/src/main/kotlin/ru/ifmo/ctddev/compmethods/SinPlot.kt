@@ -3,9 +3,12 @@ package ru.ifmo.ctddev.compmethods
 import de.erichseifert.gral.data.DataTable
 import de.erichseifert.gral.plots.XYPlot
 import de.erichseifert.gral.plots.colors.SingleColor
+import de.erichseifert.gral.plots.lines.DefaultLineRenderer2D
 import de.erichseifert.gral.ui.InteractivePanel
 import java.awt.BorderLayout
 import java.awt.Color
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.JButton
 import javax.swing.JFrame
 
@@ -32,17 +35,28 @@ class SinPlot() : JFrame() {
             Complex(1.0, 0.0),
             Complex(-0.5, Math.sqrt(3.0) / 2),
             Complex(-0.5, -Math.sqrt(3.0) / 2))
+    private val userData = createDataTable()
+    private val userDataColor = Color.BLACK
     private val interactivePanel: InteractivePanel
+
 
     init {
         data[0].add(-defaultWidth / 2, -defaultWidth / 2)
         data[0].add(defaultWidth / 2, defaultWidth / 2)
 
-        plot = XYPlot(data[0], data[1], data[2])
-        plot.getAxis(XYPlot.AXIS_X).isAutoscaled = false
-        plot.getAxis(XYPlot.AXIS_Y).isAutoscaled = false
+        plot = XYPlot(data[0], data[1], data[2], userData)
+        val xAxis = plot.getAxis(XYPlot.AXIS_X)
+        val yAxis = plot.getAxis(XYPlot.AXIS_Y)
+        val xAxisRenderer = plot.getAxisRenderer(XYPlot.AXIS_X)
+        val yAxisRenderer = plot.getAxisRenderer(XYPlot.AXIS_Y)
+        xAxis.isAutoscaled = false
+        yAxis.isAutoscaled = false
 
-        setSize(800, 600)
+        data.zip(colors).forEach {
+            plot.getPointRenderers(it.first)[0].color = SingleColor(it.second)
+        }
+
+        setSize(600, 600)
         defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         contentPane.layout = BorderLayout()
         interactivePanel = InteractivePanel(plot)
@@ -54,21 +68,31 @@ class SinPlot() : JFrame() {
             interactivePanel.repaint()
         }
 
+        interactivePanel.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent?) {
+                val x = (e?.x ?: return)
+                val y = (e?.y ?: return)
+
+                userData.clear()
+
+                val plotX = xAxisRenderer.viewToWorld(xAxis, x.toDouble(), true).toDouble()
+                val plotY = yAxisRenderer.viewToWorld(yAxis, plot.bounds.height - y.toDouble(), true).toDouble()
+
+                val seq = IterativeComputationSequence(Complex(plotX, plotY), MY_FUNC, MY_FUNC_LAMBDA, EPS)
+                userData.add(plotX, plotY)
+                for ((r, i) in seq) {
+                    userData.add(r, i)
+                }
+                repaint()
+            }
+        })
+
         redraw()
 
-        // TODO add click listener
-//        val seq = IterativeComputationSequence(MY_START_POINT, MY_FUNC, MY_FUNC_LAMBDA, EPS)
-//
-//        for ((r, i) in seq) {
-//            newtonData.add(r, i)
-//        }
     }
 
     fun redraw() {
-        data.forEach {
-            plot.remove(it)
-            it.clear()
-        }
+        data.forEach(DataTable::clear)
 
         val height = if (plot.bounds.height == 0.0) bounds.height.toDouble() else plot.bounds.height
         val width = if (plot.bounds.width == 0.0) bounds.width.toDouble() else plot.bounds.width
@@ -77,7 +101,7 @@ class SinPlot() : JFrame() {
         val xAxis = plot.getAxis(XYPlot.AXIS_X)
         val yAxis = plot.getAxis(XYPlot.AXIS_Y)
 
-        val density = 7.0
+        val density = 5.0
 
         val xStepN = (width / density).toInt()
         val minX = xAxis.min.toDouble()
@@ -102,12 +126,11 @@ class SinPlot() : JFrame() {
             x += stepX
         }
 
-        data.zip(colors).forEach {
-            plot.add(it.first)
-//            plot.setLineRenderers(it.first, DefaultLineRenderer2D())
-            plot.getPointRenderers(it.first)[0].color = SingleColor(it.second)
-//            plot.getLineRenderers(it.first)[0].color = it.second
-        }
+        val userLineRenderer = DefaultLineRenderer2D()
+        userLineRenderer.color = userDataColor
+        plot.setLineRenderers(userData, userLineRenderer)
+        val userPointRenderer = plot.getPointRenderers(userData)[0]
+        userPointRenderer.color = SingleColor(userDataColor)
     }
 }
 
