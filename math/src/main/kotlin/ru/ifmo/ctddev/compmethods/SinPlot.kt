@@ -12,6 +12,18 @@ import javax.swing.JFrame
 
 val PLOT_FEATURES_COLOR = Color(0.0f, 0.3f, 1.0f)
 
+val NEWTON_FEATURES_COLOR = Color(1.0f, 0.7f, 0.0f)
+
+val MY_FUNC = object : (Complex) -> Complex {
+    override fun invoke(x: Complex) = x * x * x - 1.0.toComplex()
+}
+
+val MY_FUNC_LAMBDA = object : (Complex) -> Complex {
+    override fun invoke(x: Complex) = 1.0.toComplex() / x / x / 3.0
+}
+
+val EPS = 1E-06
+
 class SinPlot() : JFrame() {
 
     private val defaultWidth = 6.0
@@ -53,13 +65,22 @@ class SinPlot() : JFrame() {
         val xStepN = 200
         val minX = xAxis.min.toDouble()
         val maxX = xAxis.max.toDouble()
-        val step = (maxX - minX) / xStepN
+        val stepX = (maxX - minX) / xStepN
+        val yStepN = 200
+        val minY = YAxis.min.toDouble()
+        val maxY = yAxis.max.toDouble()
+        val stepY = (maxY - minY) / YStepN
 
         var x = minX
         while (x <= maxX) {
-            val y = Math.sin(x)
-            data.add(x, y)
-            x += step
+            var y = minY
+            while (y <= )
+            x += stepX
+        }
+        val seq = IterativeComputationSequence(MY_START_POINT, MY_FUNC, MY_FUNC_LAMBDA, EPS)
+
+        for ((r, i) in seq) {
+            newtonData.add(r, i)
         }
 
         plot.add(data)
