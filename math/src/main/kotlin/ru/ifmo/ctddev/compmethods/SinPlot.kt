@@ -6,6 +6,7 @@ import de.erichseifert.gral.plots.colors.SingleColor
 import de.erichseifert.gral.plots.lines.DefaultLineRenderer2D
 import de.erichseifert.gral.ui.InteractivePanel
 import java.awt.Color
+import java.util.*
 import javax.swing.JFrame
 
 val PLOT_FEATURES_COLOR = Color(0.0f, 0.3f, 1.0f)
@@ -20,9 +21,13 @@ val MY_FUNC_LAMBDA = object : (Complex) -> Complex {
     override fun invoke(x: Complex) = 1.0.toComplex() / x / x / 3.0
 }
 
-val MY_START_POINT = Complex(7.0, 4.0)
+val RND = Random()
 
-val EPS = 0E-06
+fun Random.nextDouble(max : Double) = (nextDouble() - 0.5) * max * 2
+
+val MY_START_POINT = Complex(RND.nextDouble(10.0), RND.nextDouble(10.0))
+
+val EPS = 1E-06
 
 fun createData() = DataTable(Double::class.javaObjectType, Double::class.javaObjectType)
 
