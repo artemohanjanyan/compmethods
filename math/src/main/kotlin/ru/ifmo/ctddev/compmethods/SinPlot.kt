@@ -3,16 +3,11 @@ package ru.ifmo.ctddev.compmethods
 import de.erichseifert.gral.data.DataTable
 import de.erichseifert.gral.plots.XYPlot
 import de.erichseifert.gral.plots.colors.SingleColor
-import de.erichseifert.gral.plots.lines.DefaultLineRenderer2D
 import de.erichseifert.gral.ui.InteractivePanel
 import java.awt.BorderLayout
 import java.awt.Color
 import javax.swing.JButton
 import javax.swing.JFrame
-
-val PLOT_FEATURES_COLOR = Color(0.0f, 0.3f, 1.0f)
-
-val NEWTON_FEATURES_COLOR = Color(1.0f, 0.7f, 0.0f)
 
 val MY_FUNC = object : (Complex) -> Complex {
     override fun invoke(x: Complex) = x * x * x - 1.0.toComplex()
@@ -24,20 +19,26 @@ val MY_FUNC_LAMBDA = object : (Complex) -> Complex {
 
 val EPS = 1E-06
 
+fun createDataTable() = DataTable(Double::class.javaObjectType, Double::class.javaObjectType)
+
 class SinPlot() : JFrame() {
 
     private val defaultWidth = 6.0
 
     private var plot: XYPlot
-    private var data: DataTable
+    private val data = arrayOf(createDataTable(), createDataTable(), createDataTable())
+    private val colors = arrayOf(Color.RED, Color.GREEN, Color.BLUE)
+    private val points = arrayOf(
+            Complex(1.0, 0.0),
+            Complex(-0.5, Math.sqrt(3.0) / 2),
+            Complex(-0.5, -Math.sqrt(3.0) / 2))
     private val interactivePanel: InteractivePanel
 
     init {
-        data = DataTable(Double::class.javaObjectType, Double::class.javaObjectType)
-        data.add(-defaultWidth / 2, -defaultWidth / 2)
-        data.add(defaultWidth / 2, defaultWidth / 2)
+        data[0].add(-defaultWidth / 2, -defaultWidth / 2)
+        data[0].add(defaultWidth / 2, defaultWidth / 2)
 
-        plot = XYPlot(data)
+        plot = XYPlot(data[0], data[1], data[2])
         plot.getAxis(XYPlot.AXIS_X).isAutoscaled = false
         plot.getAxis(XYPlot.AXIS_Y).isAutoscaled = false
 
@@ -54,39 +55,59 @@ class SinPlot() : JFrame() {
         }
 
         redraw()
+
+        // TODO add click listener
+//        val seq = IterativeComputationSequence(MY_START_POINT, MY_FUNC, MY_FUNC_LAMBDA, EPS)
+//
+//        for ((r, i) in seq) {
+//            newtonData.add(r, i)
+//        }
     }
 
     fun redraw() {
-        plot.remove(data)
-        data.clear()
+        data.forEach {
+            plot.remove(it)
+            it.clear()
+        }
+
+        val height = if (plot.bounds.height == 0.0) bounds.height.toDouble() else plot.bounds.height
+        val width = if (plot.bounds.width == 0.0) bounds.width.toDouble() else plot.bounds.width
+        println("$height $width")
 
         val xAxis = plot.getAxis(XYPlot.AXIS_X)
+        val yAxis = plot.getAxis(XYPlot.AXIS_Y)
 
-        val xStepN = 200
+        val density = 7.0
+
+        val xStepN = (width / density).toInt()
         val minX = xAxis.min.toDouble()
         val maxX = xAxis.max.toDouble()
         val stepX = (maxX - minX) / xStepN
-        val yStepN = 200
-        val minY = YAxis.min.toDouble()
+        val yStepN = (height / density).toInt()
+        val minY = yAxis.min.toDouble()
         val maxY = yAxis.max.toDouble()
-        val stepY = (maxY - minY) / YStepN
+        val stepY = (maxY - minY) / yStepN
 
         var x = minX
         while (x <= maxX) {
             var y = minY
-            while (y <= )
+            while (y <= maxY) {
+                val seq = IterativeComputationSequence(Complex(x, y), MY_FUNC, MY_FUNC_LAMBDA, EPS)
+                val root = seq.computeRoot()
+                data.zip(points).find {
+                    it.second.equals(root, EPS)
+                }?.first?.add(x, y)
+                y += stepY
+            }
             x += stepX
         }
-        val seq = IterativeComputationSequence(MY_START_POINT, MY_FUNC, MY_FUNC_LAMBDA, EPS)
 
-        for ((r, i) in seq) {
-            newtonData.add(r, i)
+        data.zip(colors).forEach {
+            plot.add(it.first)
+//            plot.setLineRenderers(it.first, DefaultLineRenderer2D())
+            plot.getPointRenderers(it.first)[0].color = SingleColor(it.second)
+//            plot.getLineRenderers(it.first)[0].color = it.second
         }
-
-        plot.add(data)
-        plot.setLineRenderers(data, DefaultLineRenderer2D())
-        plot.getPointRenderers(data)[0].color = SingleColor(PLOT_FEATURES_COLOR)
-        plot.getLineRenderers(data)[0].color = PLOT_FEATURES_COLOR
     }
 }
 
