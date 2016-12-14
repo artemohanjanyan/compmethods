@@ -20,7 +20,7 @@ class IterativeComputationSequence(start: Complex,
         return cur
     }
 
-    override fun hasNext() = (next - cur).abs > eps
+    override fun hasNext() = !cur.equals(next, eps)
 
     private fun computeNext() = cur - function(cur) * lambda(cur)
 }

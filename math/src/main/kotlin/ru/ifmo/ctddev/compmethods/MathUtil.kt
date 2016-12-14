@@ -20,6 +20,8 @@ data class Complex(val real: Double, val imaginary: Double) {
     operator fun div(c : Complex) =
             this * c.conjugate / (c.real.square() + c.imaginary.square())
 
+    fun equals(c : Complex, eps : Double) = (this - c).abs < eps
+
     val conjugate : Complex
         get() = Complex(real, -imaginary)
 
