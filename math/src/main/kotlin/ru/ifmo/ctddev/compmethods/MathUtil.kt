@@ -22,6 +22,9 @@ data class Complex(val real: Double, val imaginary: Double) {
 
     val conjugate : Complex
         get() = Complex(real, -imaginary)
+
+    val abs : Double
+        get() = Math.sqrt(real.square() + imaginary.square())
 }
 
 fun Double.square() = this * this
