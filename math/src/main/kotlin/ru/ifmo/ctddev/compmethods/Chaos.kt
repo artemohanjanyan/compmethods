@@ -5,6 +5,8 @@ import de.erichseifert.gral.ui.InteractivePanel
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Rectangle
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.JButton
 
 import javax.swing.JFrame
@@ -44,6 +46,19 @@ class Chaos() : JFrame() {
             interactivePanel.repaint()
         }
 
+        interactivePanel.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent?) {
+                val x = (e?.x ?: return)
+
+                val xAxis = plot.getAxis(XYPlot.AXIS_X)
+                val xAxisRenderer = plot.getAxisRenderer(XYPlot.AXIS_X)
+                val plotX = xAxisRenderer.viewToWorld(xAxis, x.toDouble(), true).toDouble()
+
+                val frame = ChaosDetail(plotX)
+                frame.isVisible = true
+            }
+        })
+
         fillData()
     }
 
@@ -60,7 +75,7 @@ class Chaos() : JFrame() {
             ri.trace("it ")
             val r = ri * rStep + minR
             var startX = xStep
-            while (startX <= 1) {
+            while (startX < 1) {
                 data.add(r, compute(startX, r))
                 startX += xStep
             }
