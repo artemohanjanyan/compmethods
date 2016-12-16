@@ -24,7 +24,7 @@ val EPS = 1E-06
 
 fun createDataTable() = DataTable(Double::class.javaObjectType, Double::class.javaObjectType)
 
-class SinPlot() : JFrame() {
+class Newton() : JFrame() {
 
     private val defaultWidth = 6.0
 
@@ -134,6 +134,6 @@ class SinPlot() : JFrame() {
 }
 
 fun main(args: Array<String>) {
-    val frame = SinPlot()
+    val frame = Newton()
     frame.isVisible = true
 }
